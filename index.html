@@ -303,7 +303,7 @@
   <button class="nav-logo" onclick="showView('home')">Nü <span style="font-size:0.9rem;">🌙</span></button>
   <div class="nav-links">
     <button onclick="showView('home','jornada')">Jornada</button>
-    <button onclick="showView('colecao')">Coleção</button>
+    <button onclick="showView('')">Coleção</button>
     <button onclick="showView('quiz')">Quiz</button>
     <button onclick="showView('home','especialistas')">Especialistas</button>
   </div>
@@ -671,7 +671,7 @@
       precoAntigo: 69,9,
       tag: "novo",
       tagTipo: "", // "scarce" deixa rosa
-      imagem: "https://acdn-us.mitiendanube.com/stores/001/775/571/products/prancheta-48-copiar-1-ed0ab47e42749b68d817660642602292-50-0.webp"
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
     },
     {
       id: "nova-2",
@@ -1157,7 +1157,7 @@
     document.getElementById('resultDesc').textContent = data.desc;
     
     const cta = document.getElementById('resultCta');
-    cta.onclick = ()=> showView('colecao', data.tab);
+    cta.onclick = ()=> showView('', data.tab);
 
     const wrap = document.getElementById('resultProducts');
     wrap.innerHTML = '';
@@ -1179,7 +1179,7 @@
   // INICIALIZAÇÃO DA PÁGINA E DO CATÁLOGO
   renderizarCatalogo();
   const initial = window.location.hash.replace('#','');
-  if(['home','colecao','quiz'].includes(initial)) showView(initial);
+  if(['home','','quiz'].includes(initial)) showView(initial);
 </script>
 
 </body>
