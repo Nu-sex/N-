@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nü — o prazer, revisitado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E7; --cream-2:#EFE8D9; --charcoal:#1C1A17; --charcoal-soft:#2A2723;
+    --sage:#7C8A72; --sage-dark:#5B6753; --sage-light:#A9B49E;
+    --blush:#D3A188; --gold:#B99765; --midnight:#1B1E24; --midnight-2:#252A33;
+    --line: rgba(28,26,23,0.12); --line-light: rgba(246,241,231,0.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--cream);color:var(--charcoal);font-family:'Inter',sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;}
+  h1,h2,h3,.serif{font-family:'Fraunces',serif;font-weight:500;letter-spacing:-0.01em;}
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;}
+  button{font-family:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px;}}
+  .eyebrow{font-family:'Inter',sans-serif;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--sage-dark);font-weight:600;}
+
+  /* ===== VIEW SWITCHING ===== */
+  .view{display:none;}
+  .view.active{display:block;animation:viewfade .45s ease;}
+  @keyframes viewfade{from{opacity:0;}to{opacity:1;}}
+
+  /* ===== NAV (shared) ===== */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 32px;transition:background .35s ease, backdrop-filter .35s ease, padding .3s ease, border-color .35s ease;
+    border-bottom:1px solid transparent;
+  }
+  nav.on-light{background:rgba(246,241,231,0.88);backdrop-filter:blur(14px);border-bottom-color:var(--line);}
+  nav.on-dark.scrolled{background:rgba(27,30,36,0.75);backdrop-filter:blur(14px);border-bottom-color:var(--line-light);}
+  .nav-logo{font-family:'Fraunces',serif;font-size:1.4rem;cursor:pointer;background:none;border:none;color:inherit;}
+  .nav-logo.light-text{color:var(--charcoal);}
+  .nav-logo.dark-text{color:var(--cream);}
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links button{background:none;border:none;font-size:0.85rem;opacity:0.75;cursor:pointer;color:inherit;font-family:'Inter',sans-serif;}
+  .nav-links button:hover{opacity:1;}
+  
+  .nav-actions {display: flex; gap: 14px; align-items: center;}
+  .nav-cta{font-size:0.8rem;font-weight:600;padding:10px 20px;border-radius:100px;cursor:pointer;border:1px solid currentColor;background:none;color:inherit;transition:.25s;font-family:'Inter',sans-serif;}
+  .nav-cta.light-text:hover{background:var(--charcoal);color:var(--cream);}
+  .nav-cta.dark-text:hover{background:var(--cream);color:var(--charcoal);}
+  
+  /* CARRINHO BOTÃO NAVBAR */
+  .cart-trigger {position: relative; background: none; border: none; cursor: pointer; color: inherit; padding: 4px; display: flex; align-items: center;}
+  .cart-trigger svg {width: 22px; height: 22px; stroke: currentColor;}
+  .cart-badge {position: absolute; top: -4px; right: -6px; background: var(--blush); color: var(--charcoal); font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transform: scale(0); transition: transform 0.2s;}
+  .cart-badge.show {transform: scale(1);}
+
+  @media(max-width:800px){.nav-links{display:none;}}
+
+  /* ===== SLIDE-OUT CART (WHATSAPP) ===== */
+  .cart-overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s;}
+  .cart-overlay.open {opacity: 1; pointer-events: auto;}
+  .cart-drawer {position: fixed; top: 0; right: 0; width: 420px; max-width: 90vw; height: 100%; background: var(--cream); z-index: 301; box-shadow: -10px 0 30px rgba(0,0,0,0.15); transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; color: var(--charcoal);}
+  .cart-drawer.open {transform: translateX(0);}
+  
+  .cart-header {padding: 20px 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;}
+  .cart-header h3 {font-size: 1.25rem;}
+  .cart-close {background: none; border: none; font-size: 1.6rem; cursor: pointer; color: inherit;}
+  
+  .cart-progress {padding: 14px 24px; background: var(--cream-2); font-size: 0.8rem; border-bottom: 1px solid var(--line); text-align: center;}
+  .cart-progress-bar {width: 100%; height: 4px; background: rgba(0,0,0,0.1); margin-top: 8px; border-radius: 2px; overflow: hidden;}
+  .cart-progress-fill {height: 100%; background: var(--sage); width: 0%; transition: width 0.3s;}
+  
+  .cart-items {flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px;}
+  .cart-item {display: flex; gap: 14px; border-bottom: 1px solid var(--line); padding-bottom: 16px;}
+  .cart-item-img {width: 60px; height: 60px; background: var(--cream-2); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;}
+  .cart-item-img img {width: 100%; height: 100%; object-fit: cover;}
+  .cart-item-info {flex: 1;}
+  .cart-item-title {font-family: 'Fraunces', serif; font-size: 0.95rem; font-weight: 500;}
+  .cart-item-price {font-size: 0.85rem; color: rgba(28,26,23,0.7); margin-top: 2px; font-weight: 600;}
+  .cart-item-actions {display: flex; align-items: center; justify-content: space-between; margin-top: 8px;}
+  .qty-selector {display: flex; border: 1px solid var(--line); border-radius: 100px; overflow: hidden;}
+  .qty-selector button {background: none; border: none; padding: 2px 10px; cursor: pointer; font-weight: 600;}
+  .qty-selector span {padding: 2px 8px; font-size: 0.85rem;}
+  
+  .cart-footer {padding: 24px; border-top: 1px solid var(--line); background: var(--cream);}
+  .cart-summary-row {display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 8px;}
+  .cart-summary-row.total {font-weight: 600; font-size: 1.1rem; margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 12px;}
+  .btn-checkout {width: 100%; background: #2E5C40; color: var(--cream); border: none; padding: 16px; border-radius: 100px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;}
+  .btn-checkout:hover {background: #244933;}
+  .cart-security-note {display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.72rem; color: rgba(28,26,23,0.6); margin-top: 12px; text-align: center;}
+
+  /* =========================================================
+     VIEW: HOME
+  ========================================================= */
+  .hero{
+    position:relative;min-height:100vh;
+    background:radial-gradient(ellipse 120% 90% at 50% -10%, #2A303A 0%, var(--midnight) 45%, #14161B 100%);
+    color:var(--cream);display:flex;flex-direction:column;justify-content:center;align-items:center;
+    text-align:center;padding:120px 24px 80px;overflow:hidden;
+  }
+  .hero-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.35;pointer-events:none;}
+  .orb1{width:420px;height:420px;background:var(--sage);top:-120px;left:-120px;}
+  .orb2{width:340px;height:340px;background:var(--blush);bottom:-100px;right:-80px;opacity:0.22;}
+  .moon-wrap{width:120px;height:120px;margin-bottom:38px;}
+  .hero-eyebrow{color:var(--sage-light);margin-bottom:22px;}
+  .hero h1{font-size:clamp(2.6rem,6vw,4.6rem);line-height:1.06;max-width:820px;font-weight:400;font-style:italic;}
+  .hero h1 em{font-style:normal;color:var(--sage-light);}
+  .hero p{margin-top:26px;max-width:520px;font-size:1.05rem;color:rgba(246,241,231,0.72);font-weight:300;}
+  .hero-ctas{display:flex;gap:16px;margin-top:42px;flex-wrap:wrap;justify-content:center;}
+  .btn-primary{background:var(--cream);color:var(--charcoal);padding:15px 32px;border-radius:100px;font-size:0.9rem;font-weight:600;transition:transform .25s,background .25s;display:inline-block;border:none;cursor:pointer;}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--sage-light);}
+  .btn-ghost{border:1px solid rgba(246,241,231,0.35);color:var(--cream);padding:15px 32px;border-radius:100px;font-size:0.9rem;background:none;cursor:pointer;transition:border-color .25s,background .25s;}
+  .btn-ghost:hover{border-color:var(--cream);background:rgba(246,241,231,0.06);}
+  .scroll-cue{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(246,241,231,0.5);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;}
+  .scroll-line{width:1px;height:34px;background:linear-gradient(to bottom, rgba(246,241,231,0.6), transparent);animation:scrollpulse 1.8s ease-in-out infinite;}
+  @keyframes scrollpulse{0%,100%{opacity:.3;}50%{opacity:1;}}
+
+  .trust{background:var(--charcoal);color:var(--cream);padding:26px 0;}
+  .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  @media(max-width:820px){.trust-grid{grid-template-columns:repeat(2,1fr);row-gap:22px;}}
+  .trust-item{display:flex;align-items:center;gap:12px;font-size:0.82rem;opacity:0.88;}
+  .trust-item svg{flex-shrink:0;width:22px;height:22px;stroke:var(--sage-light);}
+
+  section{padding:120px 0;}
+  @media(max-width:640px){section{padding:80px 0;}}
+  .section-head{max-width:600px;margin-bottom:64px;}
+  .section-head h2{font-size:clamp(2rem,4vw,2.8rem);font-weight:400;margin-top:14px;}
+  .section-head p{margin-top:16px;color:rgba(28,26,23,0.65);font-size:1rem;max-width:480px;}
+
+  .journey{background:var(--cream-2);}
+  .journey-rail{display:flex;flex-direction:column;}
+  .phase{display:grid;grid-template-columns:120px 1fr;gap:36px;padding:44px 0;border-top:1px solid var(--line);cursor:pointer;}
+  .phase:last-child{border-bottom:1px solid var(--line);}
+  .phase-moon{width:64px;height:64px;align-self:start;margin-top:6px;transition:transform .5s ease;}
+  .phase:hover .phase-moon{transform:scale(1.08) rotate(-6deg);}
+  .phase-body{display:flex;flex-direction:column;gap:10px;}
+  .phase-num{font-family:'Fraunces',serif;font-style:italic;color:var(--sage);font-size:0.95rem;}
+  .phase h3{font-size:1.7rem;font-weight:500;}
+  .phase p{color:rgba(28,26,23,0.65);max-width:460px;font-size:0.95rem;}
+  .phase-link{margin-top:6px;font-size:0.82rem;font-weight:600;color:var(--sage-dark);display:inline-flex;align-items:center;gap:6px;width:fit-content;border-bottom:1px solid transparent;transition:border-color .2s;}
+  .phase:hover .phase-link{border-color:var(--sage-dark);}
+  @media(max-width:640px){.phase{grid-template-columns:52px 1fr;gap:20px;}.phase-moon{width:44px;height:44px;}}
+
+  .proof{background:var(--charcoal);color:var(--cream);}
+  .proof .eyebrow{color:var(--sage-light);}
+  .proof-stat{font-family:'Fraunces',serif;font-size:clamp(3rem,7vw,5.5rem);font-weight:400;font-style:italic;color:var(--cream);line-height:1;}
+  .proof-stat span{color:var(--sage-light);}
+  .proof-stat-label{margin-top:10px;color:rgba(246,241,231,0.6);font-size:0.95rem;max-width:340px;}
+  .proof-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:60px;align-items:start;margin-top:20px;}
+  @media(max-width:860px){.proof-grid{grid-template-columns:1fr;gap:44px;}}
+  .quote-list{display:flex;flex-direction:column;gap:28px;}
+  .quote{border-left:2px solid var(--sage);padding-left:22px;}
+  .quote p{font-family:'Fraunces',serif;font-style:italic;font-size:1.15rem;font-weight:400;color:var(--cream);}
+  .quote-name{margin-top:10px;font-size:0.78rem;color:rgba(246,241,231,0.55);letter-spacing:0.03em;}
+
+  .quiz-teaser{background:linear-gradient(120deg, var(--sage-dark), var(--sage) 60%, var(--gold));color:var(--cream);}
+  .quiz-teaser-inner{display:grid;grid-template-columns:1.1fr 0.8fr;gap:48px;align-items:center;}
+  @media(max-width:820px){.quiz-teaser-inner{grid-template-columns:1fr;}}
+  .quiz-teaser h2{font-size:clamp(1.9rem,4vw,2.6rem);font-weight:400;}
+  .quiz-teaser p{margin-top:16px;color:rgba(246,241,231,0.85);max-width:440px;}
+  .quiz-card{background:rgba(246,241,231,0.12);border:1px solid rgba(246,241,231,0.28);border-radius:20px;padding:32px;backdrop-filter:blur(6px);}
+  .quiz-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:22px;}
+  .quiz-step{display:flex;gap:12px;align-items:center;font-size:0.88rem;color:rgba(246,241,231,0.9);}
+  .quiz-step .dot{width:20px;height:20px;border-radius:50%;background:rgba(246,241,231,0.25);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0;}
+  .quiz-cta-btn{width:100%;background:var(--cream);color:var(--charcoal);padding:16px;border-radius:100px;font-weight:600;font-size:0.92rem;text-align:center;transition:transform .2s;border:none;cursor:pointer;}
+  .quiz-cta-btn:hover{transform:translateY(-2px);}
+  .quiz-fine{margin-top:14px;font-size:0.72rem;color:rgba(246,241,231,0.65);text-align:center;}
+
+  .authority-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:64px;align-items:center;}
+  @media(max-width:860px){.authority-grid{grid-template-columns:1fr;gap:36px;}}
+  .authority-badges{display:flex;flex-direction:column;gap:22px;}
+  .badge{display:flex;gap:16px;align-items:flex-start;padding:20px;background:var(--cream-2);border-radius:14px;}
+  .badge svg{width:26px;height:26px;stroke:var(--sage-dark);flex-shrink:0;margin-top:2px;}
+  .badge h4{font-family:'Fraunces',serif;font-weight:500;font-size:1.05rem;margin-bottom:4px;}
+  .badge p{font-size:0.85rem;color:rgba(28,26,23,0.6);}
+
+  footer{background:var(--charcoal);color:rgba(246,241,231,0.6);padding:64px 0 32px;}
+  .footer-top{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:40px;padding-bottom:48px;border-bottom:1px solid var(--line-light);}
+  @media(max-width:760px){.footer-top{grid-template-columns:1fr 1fr;}}
+  .footer-logo{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--cream);margin-bottom:12px;}
+  .footer-tag{font-size:0.85rem;max-width:240px;color:rgba(246,241,231,0.5);}
+  .footer-col h5{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(246,241,231,0.4);margin-bottom:16px;}
+  .footer-col button{display:block;background:none;border:none;font-size:0.85rem;margin-bottom:10px;color:rgba(246,241,231,0.7);transition:color .2s;cursor:pointer;font-family:'Inter',sans-serif;text-align:left;padding:0;}
+  .footer-col button:hover{color:var(--cream);}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;font-size:0.75rem;flex-wrap:wrap;gap:12px;}
+
+  [data-reveal]{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  [data-reveal].in{opacity:1;transform:translateY(0);}
+
+  /* =========================================================
+     VIEW: COLEÇÃO
+  ========================================================= */
+  #view-colecao{padding-top:64px;}
+  .page-head{padding:64px 0 40px;text-align:center;}
+  .page-head .eyebrow{display:block;margin-bottom:14px;}
+  .page-head h1{font-size:clamp(2.2rem,5vw,3.2rem);font-weight:400;font-style:italic;}
+  .page-head p{margin-top:14px;color:rgba(28,26,23,0.6);max-width:480px;margin-left:auto;margin-right:auto;}
+  .page-head button{background:none;border:none;color:var(--sage-dark);font-weight:600;text-decoration:underline;cursor:pointer;font-family:'Inter',sans-serif;font-size:1em;}
+
+  .tabs-bar{position:sticky;top:64px;z-index:90;background:var(--cream);border-bottom:1px solid var(--line);}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:18px 0;scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{display:flex;align-items:center;gap:10px;padding:12px 20px;border-radius:100px;white-space:nowrap;font-size:0.85rem;font-weight:500;cursor:pointer;border:1px solid var(--line);background:var(--cream);transition:background .25s,color .25s,border-color .25s;flex-shrink:0;}
+  .tab svg{width:16px;height:16px;}
+  .tab.active{background:var(--charcoal);color:var(--cream);border-color:var(--charcoal);}
+  .tab:not(.active):hover{border-color:var(--sage);}
+
+  .catalog{padding:48px 0 100px;}
+  .cat-panel{display:none;}
+  .cat-panel.active{display:block;animation:viewfade .5s ease;}
+  .cat-intro{max-width:600px;margin-bottom:40px;}
+  .cat-intro h2{font-size:1.8rem;font-weight:400;margin-bottom:10px;}
+  .cat-intro p{color:rgba(28,26,23,0.6);font-size:0.95rem;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--cream-2);border-radius:18px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;transition:transform .3s ease,box-shadow .3s ease;position:relative;}
+  .card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(28,26,23,0.09);}
+  .card-thumb{height:180px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .card-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease;}
+  .card:hover .card-thumb img{transform:scale(1.05);}
+  .badge-tag{position:absolute;top:12px;left:12px;font-size:0.65rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;padding:5px 10px;border-radius:100px;background:rgba(28,26,23,0.85);color:var(--cream);z-index:2;}
+  .badge-tag.scarce{background:var(--blush);color:var(--charcoal);}
+  .card-body{padding:20px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .card-body h4{font-family:'Fraunces',serif;font-weight:500;font-size:1.05rem;}
+  .card-body p{font-size:0.82rem;color:rgba(28,26,23,0.58);flex:1;}
+  .price-row{display:flex;align-items:baseline;gap:8px;margin-top:6px;}
+  .price{font-weight:600;font-size:1.05rem;}
+  .price-old{font-size:0.8rem;color:rgba(28,26,23,0.4);text-decoration:line-through;}
+  .add-btn{margin-top:10px;width:100%;padding:11px;border-radius:100px;background:var(--charcoal);color:var(--cream);font-size:0.8rem;font-weight:600;text-align:center;transition:background .2s;cursor:pointer;border:none;}
+  .add-btn:hover{background:var(--sage-dark);}
+  .add-btn.added{background:var(--sage);}
+  
+  /* BANNER DISCRETO DO WHATSAPP DENTRO DE CADA FASE */
+  .help-banner {margin-top: 48px; background: var(--cream-2); border: 1px dashed var(--sage); border-radius: 16px; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;}
+  .help-banner-text h4 {font-family: 'Fraunces', serif; font-size: 1.15rem; color: var(--charcoal);}
+  .help-banner-text p {font-size: 0.88rem; color: rgba(28,26,23,0.65); margin-top: 4px;}
+  .help-banner-btn {background: var(--sage-dark); color: var(--cream); padding: 12px 24px; border-radius: 100px; font-weight: 600; font-size: 0.85rem; border: none; cursor: pointer; transition: background .2s; display: inline-flex; align-items: center; gap: 8px;}
+  .help-banner-btn:hover {background: var(--charcoal);}
+
+  .bundle{margin-top:56px;background:var(--midnight);color:var(--cream);border-radius:20px;padding:36px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;}
+  .bundle-text h3{font-family:'Fraunces',serif;font-weight:400;font-style:italic;font-size:1.3rem;}
+  .bundle-text p{margin-top:6px;color:rgba(246,241,231,0.65);font-size:0.85rem;max-width:420px;}
+  .bundle-btn{background:var(--cream);color:var(--charcoal);padding:13px 26px;border-radius:100px;font-size:0.85rem;font-weight:600;flex-shrink:0;border:none;cursor:pointer;}
+
+  /* =========================================================
+     VIEW: QUIZ
+  ========================================================= */
+  #view-quiz{
+    min-height:100vh;
+    background:radial-gradient(ellipse 120% 100% at 50% -10%, #2A303A 0%, var(--midnight) 45%, #14161B 100%);
+    color:var(--cream);display:flex;flex-direction:column;padding-top:64px;
+  }
+  .quiz-shell{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 20px 60px;}
+  .quiz-box{width:100%;max-width:620px;}
+  .progress-row{display:flex;align-items:center;gap:14px;margin-bottom:44px;}
+  .progress-track{flex:1;height:3px;background:rgba(246,241,231,0.15);border-radius:10px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--sage-light);width:0%;transition:width .5s ease;}
+  .progress-label{font-size:0.75rem;color:rgba(246,241,231,0.55);white-space:nowrap;}
+  .qstep{display:none;}
+  .qstep.active{display:block;animation:viewfade .5s ease;}
+  .qstep .eyebrow{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--sage-light);font-weight:600;margin-bottom:14px;display:block;}
+  .qstep h2{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:400;margin-bottom:36px;line-height:1.25;}
+  .options{display:flex;flex-direction:column;gap:12px;}
+  .option{border:1px solid rgba(246,241,231,0.2);background:rgba(246,241,231,0.04);border-radius:14px;padding:18px 22px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .option:hover{border-color:var(--sage-light);background:rgba(246,241,231,0.08);}
+  .option.selected{border-color:var(--sage-light);background:rgba(169,180,158,0.16);transform:translateX(4px);}
+  .option span{font-size:0.98rem;}
+  .option .check{width:18px;height:18px;border-radius:50%;border:1px solid rgba(246,241,231,0.4);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .option.selected .check{background:var(--sage-light);border-color:var(--sage-light);}
+  .option.selected .check::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--midnight);}
+  .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:38px;}
+  .qbtn-back{font-size:0.85rem;color:rgba(246,241,231,0.5);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+  .qbtn-back:hover{color:var(--cream);}
+  .qbtn-next{background:var(--sage-light);color:var(--midnight);padding:14px 30px;border-radius:100px;font-weight:600;font-size:0.9rem;border:none;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity .25s,transform .2s;}
+  .qbtn-next.enabled{opacity:1;pointer-events:auto;}
+  .qbtn-next:hover.enabled{transform:translateY(-2px);}
+  .result-eyebrow{color:var(--sage-light);}
+  .qresult h2{font-style:italic;font-weight:400;}
+  .qresult p.desc{margin-top:14px;color:rgba(246,241,231,0.7);max-width:460px;font-size:0.98rem;}
+  .result-products{display:flex;gap:16px;margin-top:36px;flex-wrap:wrap;}
+  .rp-card{flex:1;min-width:150px;background:rgba(246,241,231,0.06);border:1px solid rgba(246,241,231,0.15);border-radius:14px;padding:18px;}
+  .rp-card h4{font-family:'Fraunces',serif;font-weight:500;font-size:0.98rem;margin-bottom:6px;}
+  .rp-card p{font-size:0.78rem;color:rgba(246,241,231,0.55);}
+  .result-ctas{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;}
+  .qbtn-secondary{border:1px solid rgba(246,241,231,0.3);padding:15px 30px;border-radius:100px;font-size:0.9rem;transition:.2s;background:none;color:var(--cream);cursor:pointer;font-family:'Inter',sans-serif;}
+  .qbtn-secondary:hover{border-color:var(--cream);}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    [data-reveal]{transition:none;opacity:1;transform:none;}
+    .scroll-line{animation:none;}
+    .phase:hover .phase-moon{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <button class="nav-logo" onclick="showView('home')">Nü <span style="font-size:0.9rem;">🌙</span></button>
+  <div class="nav-links">
+    <button onclick="showView('home','jornada')">Jornada</button>
+    <button onclick="showView('colecao')">Coleção</button>
+    <button onclick="showView('quiz')">Quiz</button>
+    <button onclick="showView('home','especialistas')">Especialistas</button>
+  </div>
+  <div class="nav-actions">
+    <button class="cart-trigger" onclick="toggleCart()" aria-label="Abrir Sacola">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+    <button class="nav-cta" onclick="showView('quiz')">Fazer o quiz</button>
+  </div>
+</nav>
+
+<!-- ===== SLIDE-OUT CART (WHATSAPP HUMANIZADO) ===== -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>Sua Sacola (<span id="cartCountHeader">0</span>)</h3>
+    <button class="cart-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-progress">
+    <span id="shippingText">Adicione R$ 250 para Frete Grátis Discreto</span>
+    <div class="cart-progress-bar">
+      <div class="cart-progress-fill" id="shippingProgress"></div>
+    </div>
+  </div>
+  <div class="cart-items" id="cartItemsContainer"></div>
+  <div class="cart-footer">
+    <div class="cart-summary-row">
+      <span>Subtotal</span>
+      <span id="cartSubtotal">R$ 0</span>
+    </div>
+    <div class="cart-summary-row">
+      <span>Frete (Discreto)</span>
+      <span id="cartShipping">R$ 19</span>
+    </div>
+    <div class="cart-summary-row total">
+      <span>Total</span>
+      <span id="cartTotal">R$ 0</span>
+    </div>
+    <button class="btn-checkout" onclick="checkoutWhatsapp()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Consultar Especialista no WhatsApp
+    </button>
+    <div class="cart-security-note">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Atendimento individual, confidencial e sem julgamentos
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     VIEW: HOME
+========================================================= -->
+<div class="view active" id="view-home">
+
+  <header class="hero">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="moon-wrap" data-reveal>
+      <svg viewBox="0 0 120 120" width="120" height="120">
+        <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(246,241,231,0.18)" stroke-width="1"/>
+        <path d="M70 20 A42 42 0 1 0 70 100 A34 34 0 1 1 70 20 Z" fill="#A9B49E"/>
+      </svg>
+    </div>
+    <p class="eyebrow hero-eyebrow" data-reveal>bem-estar íntimo, com intenção</p>
+    <h1 data-reveal>O prazer, <em>revisitado.</em></h1>
+    <p data-reveal>Uma curadoria pensada para quem busca se conhecer melhor — sem julgamento, sem pressa e sem exposição desnecessária.</p>
+    <div class="hero-ctas" data-reveal>
+      <button class="btn-primary" onclick="showView('colecao')">Explorar a coleção</button>
+      <button class="btn-ghost" onclick="scrollToId('trustbar')">Como funciona a discrição</button>
+    </div>
+    <div class="scroll-cue"><span>role a página</span><div class="scroll-line"></div></div>
+  </header>
+
+  <div class="trust" id="trustbar">
+    <div class="wrap trust-grid">
+      <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg> Embalagem 100% discreta, sem identificação externa</div>
+      <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Pagamento seguro e fatura sem nome da loja</div>
+      <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13l-4-4m4 4-4 4"/><path d="M16 5h2a3 3 0 0 1 3 3v3"/></svg> Envio rápido, em até 48h</div>
+      <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/></svg> Seus dados nunca são compartilhados</div>
+    </div>
+  </div>
+
+  <section class="journey" id="jornada">
+    <div class="wrap">
+      <div class="section-head" data-reveal>
+        <p class="eyebrow">sua jornada nü</p>
+        <h2>Assim como a lua, ninguém chega à fase cheia de uma vez.</h2>
+        <p>Organizamos a coleção pelas fases do autoconhecimento — não por categoria de produto. Comece de onde você está.</p>
+      </div>
+      <div class="journey-rail">
+        <div class="phase" data-reveal onclick="showView('colecao','nova')">
+          <svg class="phase-moon" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="none" stroke="var(--sage)" stroke-width="1.4"/></svg>
+          <div class="phase-body">
+            <span class="phase-num">lua nova</span>
+            <h3>Descubra</h3>
+            <p>Ainda entendendo o que te dá prazer? Comece com o nosso quiz e receba sugestões sem compromisso.</p>
+            <span class="phase-link">Ver linha iniciante →</span>
+          </div>
+        </div>
+        <div class="phase" data-reveal onclick="showView('colecao','crescente')">
+          <svg class="phase-moon" viewBox="0 0 64 64"><path d="M38 8A24 24 0 1 0 38 56 19 19 0 1 1 38 8Z" fill="var(--sage)"/></svg>
+          <div class="phase-body">
+            <span class="phase-num">lua crescente</span>
+            <h3>Explore</h3>
+            <p>Primeiros passos, sem pressão. Produtos para quem está começando a explorar sozinho ou a dois.</p>
+            <span class="phase-link">Ver linha explore →</span>
+          </div>
+        </div>
+        <div class="phase" data-reveal onclick="showView('colecao','cheia')">
+          <svg class="phase-moon" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="var(--sage)"/></svg>
+          <div class="phase-body">
+            <span class="phase-num">lua cheia</span>
+            <h3>Viva</h3>
+            <p>Para quem já sabe o que quer. Nossa curadoria premium, com as marcas mais bem avaliadas por especialistas.</p>
+            <span class="phase-link">Ver curadoria premium →</span>
+          </div>
+        </div>
+        <div class="phase" data-reveal onclick="showView('colecao','minguante')">
+          <svg class="phase-moon" viewBox="0 0 64 64"><path d="M26 8a24 24 0 1 1 0 48 19 19 0 1 0 0-48Z" fill="var(--sage)"/></svg>
+          <div class="phase-body">
+            <span class="phase-num">lua minguante</span>
+            <h3>Volte a se encontrar</h3>
+            <p>Autocuidado contínuo, para manter a relação com o próprio corpo — sozinho ou em casal.</p>
+            <span class="phase-link">Ver linha de bem-estar →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof">
+    <div class="wrap">
+      <div class="proof-grid">
+        <div data-reveal>
+          <p class="eyebrow">prova social</p>
+          <div class="proof-stat">+12.4<span>mil</span></div>
+          <p class="proof-stat-label">pessoas já reconstruíram a relação com o próprio prazer através da Nü</p>
+        </div>
+        <div class="quote-list">
+          <div class="quote" data-reveal><p>"Comprei sem nenhum constrangimento. Chegou numa caixa que parecia até um perfume."</p><p class="quote-name">Marina, 29 — cliente verificada</p></div>
+          <div class="quote" data-reveal><p>"O quiz acertou exatamente o que eu precisava. Não sabia nem que existia esse produto."</p><p class="quote-name">J., 34 — cliente verificado</p></div>
+          <div class="quote" data-reveal><p>"É a primeira loja do tipo em que eu não me senti julgada por perguntar."</p><p class="quote-name">Camila, 26 — cliente verificada</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="quiz-teaser">
+    <div class="wrap quiz-teaser-inner">
+      <div data-reveal>
+        <p class="eyebrow" style="color:rgba(246,241,231,0.85)">não sabe por onde começar?</p>
+        <h2>60 segundos. Zero constrangimento. Resultado só seu.</h2>
+        <p>Responda perguntas simples sobre o que você busca e receba uma seleção personalizada — sem precisar navegar por dezenas de categorias.</p>
+      </div>
+      <div class="quiz-card" data-reveal>
+        <div class="quiz-steps">
+          <div class="quiz-step"><span class="dot">1</span> Conte o que você já experimentou</div>
+          <div class="quiz-step"><span class="dot">2</span> Escolha seus objetivos de prazer</div>
+          <div class="quiz-step"><span class="dot">3</span> Receba sua seleção personalizada</div>
+        </div>
+        <button class="quiz-cta-btn" onclick="showView('quiz')">Começar o quiz gratuito</button>
+        <p class="quiz-fine">Sem cadastro obrigatório para ver o resultado</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="authority" id="especialistas">
+    <div class="wrap authority-grid">
+      <div data-reveal>
+        <p class="eyebrow">curadoria responsável</p>
+        <h2 style="font-size:clamp(1.9rem,4vw,2.6rem);font-weight:400;margin-top:14px;">Cada produto passa por uma curadoria de especialistas em saúde sexual.</h2>
+        <p style="margin-top:16px;color:rgba(28,26,23,0.65);max-width:420px;">Nada entra no catálogo Nü sem antes ser avaliado quanto à segurança dos materiais, procedência e reputação da marca.</p>
+      </div>
+      <div class="authority-badges">
+        <div class="badge" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg><div><h4>Materiais testados</h4><p>Todos os itens são avaliados quanto à composição e segurança dermatológica antes de entrar no catálogo.</p></div></div>
+        <div class="badge" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><div><h4>Time com formação em saúde sexual</h4><p>Conteúdo educativo e recomendações revisados por profissionais da área.</p></div></div>
+        <div class="badge" data-reveal><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><div><h4>Avaliações reais e verificadas</h4><p>Só publicamos avaliações de compras confirmadas — sem incentivo para nota alta.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-top">
+        <div><div class="footer-logo">Nü</div><p class="footer-tag">O prazer, revisitado. Bem-estar íntimo com curadoria, discrição e ciência.</p></div>
+        <div class="footer-col"><h5>Loja</h5>
+          <button onclick="showView('home','jornada')">Jornada</button>
+          <button onclick="showView('colecao')">Coleção</button>
+          <button onclick="showView('quiz')">Quiz</button>
+        </div>
+        <div class="footer-col"><h5>Empresa</h5>
+          <button onclick="showView('home')">Sobre a Nü</button>
+          <button onclick="showView('home','especialistas')">Especialistas</button>
+          <button onclick="showView('home')">Contato</button>
+        </div>
+        <div class="footer-col"><h5>Confiança</h5>
+          <button onclick="showView('home')">Política de privacidade</button>
+          <button onclick="showView('home','trustbar')">Discrição no envio</button>
+          <button onclick="showView('home')">Trocas e devoluções</button>
+        </div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Nü. Todos os direitos reservados.</span><span>Embalagem 100% discreta, sempre. 🌙</span></div>
+    </div>
+  </footer>
+</div>
+
+<!-- =========================================================
+     VIEW: COLEÇÃO
+========================================================= -->
+<div class="view" id="view-colecao">
+  <header class="page-head wrap">
+    <span class="eyebrow">coleção completa</span>
+    <h1>Escolha pela fase, não pela categoria.</h1>
+    <p>Organizamos tudo pela sua jornada de autoconhecimento. Não sabe em qual fase está? <button onclick="showView('quiz')">Faça o quiz →</button></p>
+  </header>
+
+  <div class="tabs-bar">
+    <div class="wrap">
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="nova"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>Lua Nova · Descubra</div>
+        <div class="tab" data-tab="crescente"><svg viewBox="0 0 24 24"><path d="M15 3a9 9 0 1 0 0 18 7 7 0 1 1 0-18Z" fill="currentColor"/></svg>Lua Crescente · Explore</div>
+        <div class="tab" data-tab="cheia"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>Lua Cheia · Viva</div>
+        <div class="tab" data-tab="minguante"><svg viewBox="0 0 24 24"><path d="M9 3a9 9 0 1 1 0 18 7 7 0 1 0 0-18Z" fill="currentColor"/></svg>Lua Minguante · Volte a se encontrar</div>
+      </div>
+    </div>
+  </div>
+
+  <main class="catalog wrap">
+    <!-- OS PRODUTOS SÃO INJETADOS AUTOMATICAMENTE VIA JAVASCRIPT AQUI -->
+    <section class="cat-panel active" id="panel-nova">
+      <div class="cat-intro"><h2>Lua Nova · Descubra</h2><p>Para quem está começando a entender o próprio prazer. Produtos simples, guiados e sem intimidação.</p></div>
+      <div class="grid" id="grid-nova"></div>
+      <div class="help-banner">
+        <div class="help-banner-text">
+          <h4>Não encontrou o que buscava em Lua Nova?</h4>
+          <p>Fale agora com nossa especialista e acesse nosso catálogo completo e reservado.</p>
+        </div>
+        <button class="help-banner-btn" onclick="openGeneralWhatsApp()">Consultar Catálogo Completo 💬</button>
+      </div>
+    </section>
+
+    <section class="cat-panel" id="panel-crescente">
+      <div class="cat-intro"><h2>Lua Crescente · Explore</h2><p>Primeiros passos além do básico — sem pressa, sem pressão.</p></div>
+      <div class="grid" id="grid-crescente"></div>
+      <div class="help-banner">
+        <div class="help-banner-text">
+          <h4>Não encontrou o que buscava em Lua Crescente?</h4>
+          <p>Fale agora com nossa especialista e acesse nosso catálogo completo e reservado.</p>
+        </div>
+        <button class="help-banner-btn" onclick="openGeneralWhatsApp()">Consultar Catálogo Completo 💬</button>
+      </div>
+    </section>
+
+    <section class="cat-panel" id="panel-cheia">
+      <div class="cat-intro"><h2>Lua Cheia · Viva</h2><p>Para quem já sabe o que quer. Curadoria premium, marcas mais bem avaliadas.</p></div>
+      <div class="grid" id="grid-cheia"></div>
+      <div class="help-banner">
+        <div class="help-banner-text">
+          <h4>Não encontrou o que buscava em Lua Cheia?</h4>
+          <p>Fale agora com nossa especialista e acesse nosso catálogo completo e reservado.</p>
+        </div>
+        <button class="help-banner-btn" onclick="openGeneralWhatsApp()">Consultar Catálogo Completo 💬</button>
+      </div>
+    </section>
+
+    <section class="cat-panel" id="panel-minguante">
+      <div class="cat-intro"><h2>Lua Minguante · Volte a se encontrar</h2><p>Bem-estar contínuo. Manter a relação com o próprio corpo é um hábito, não um evento.</p></div>
+      <div class="grid" id="grid-minguante"></div>
+      <div class="help-banner">
+        <div class="help-banner-text">
+          <h4>Não encontrou o que buscava em Lua Minguante?</h4>
+          <p>Fale agora com nossa especialista e acesse nosso catálogo completo e reservado.</p>
+        </div>
+        <button class="help-banner-btn" onclick="openGeneralWhatsApp()">Consultar Catálogo Completo 💬</button>
+      </div>
+    </section>
+
+    <div class="bundle">
+      <div class="bundle-text"><h3>Leve o kit completo da sua fase e economize 15%</h3><p>Compras combinadas convertem melhor — e a gente passa essa economia pra você.</p></div>
+      <button class="bundle-btn" onclick="openGeneralWhatsApp()">Ver kits combinados</button>
+    </div>
+  </main>
+
+  <footer style="text-align:center;font-size:0.78rem;">© 2026 Nü — embalagem 100% discreta, sempre. 🌙</footer>
+</div>
+
+<!-- =========================================================
+     VIEW: QUIZ
+========================================================= -->
+<div class="view" id="view-quiz">
+  <div class="quiz-shell">
+    <div class="quiz-box">
+      <div class="progress-row" id="progressRow">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="progress-label" id="progressLabel">1 de 3</span>
+      </div>
+
+      <div class="qstep active" data-step="1">
+        <span class="eyebrow">pergunta 1</span>
+        <h2>Como você descreveria sua experiência até agora?</h2>
+        <div class="options" data-question="q1">
+          <div class="option" data-score="nova:2"><span>Ainda não experimentei nada</span><div class="check"></div></div>
+          <div class="option" data-score="crescente:2"><span>Já experimentei sozinho(a) algumas vezes</span><div class="check"></div></div>
+          <div class="option" data-score="cheia:2"><span>Tenho bastante experiência</span><div class="check"></div></div>
+          <div class="option" data-score="minguante:2"><span>Já experimentei bastante e quero manter o hábito</span><div class="check"></div></div>
+        </div>
+        <div class="step-nav"><span></span><button class="qbtn-next" data-next="2">Continuar →</button></div>
+      </div>
+
+      <div class="qstep" data-step="2">
+        <span class="eyebrow">pergunta 2</span>
+        <h2>O que você busca agora?</h2>
+        <div class="options" data-question="q2">
+          <div class="option" data-score="nova:1"><span>Entender melhor meu próprio corpo</span><div class="check"></div></div>
+          <div class="option" data-score="crescente:1"><span>Dar o próximo passo, sem exagero</span><div class="check"></div></div>
+          <div class="option" data-score="cheia:1"><span>Uma experiência mais intensa</span><div class="check"></div></div>
+          <div class="option" data-score="minguante:1"><span>Manter uma rotina de autocuidado</span><div class="check"></div></div>
+        </div>
+        <div class="step-nav"><button class="qbtn-back" data-back="1">← Voltar</button><button class="qbtn-next" data-next="3">Continuar →</button></div>
+      </div>
+
+      <div class="qstep" data-step="3">
+        <span class="eyebrow">pergunta 3</span>
+        <h2>Qual formato combina mais com você?</h2>
+        <div class="options" data-question="q3">
+          <div class="option" data-score="nova:1"><span>Prefiro começar com algo simples e guiado</span><div class="check"></div></div>
+          <div class="option" data-score="crescente:1"><span>Algo discreto e fácil de usar</span><div class="check"></div></div>
+          <div class="option" data-score="cheia:1"><span>Não tenho medo de intensidade</span><div class="check"></div></div>
+          <div class="option" data-score="minguante:1"><span>Prefiro experiências sensoriais (óleos, velas, texturas)</span><div class="check"></div></div>
+        </div>
+        <div class="step-nav"><button class="qbtn-back" data-back="2">← Voltar</button><button class="qbtn-next" data-next="result">Ver meu resultado →</button></div>
+      </div>
+
+      <div class="qstep qresult" data-step="result">
+        <span class="eyebrow result-eyebrow">seu resultado</span>
+        <h2 id="resultTitle">Lua Nova · Descubra</h2>
+        <p class="desc" id="resultDesc">Você está no início dessa jornada — e tudo bem começar devagar.</p>
+        <div class="result-products" id="resultProducts"></div>
+        <div class="result-ctas">
+          <button class="btn-primary" id="resultCta">Ver produtos recomendados</button>
+          <button class="qbtn-secondary" onclick="restartQuiz()">Refazer o quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* =========================================================================
+     1. ÁREA DE FÁCIL ADIÇÃO DE PRODUTOS E IMAGENS
+     Basta duplicar as linhas dentro da categoria que quiser e colocar a imagem.
+     Se não tiver o link de uma imagem (url), ele colocará uma foto elegante por padrão.
+  ========================================================================= */
+  const NUMERO_WHATSAPP = "5511999999999"; // <-- INSIRA SEU NÚMERO DE WHATSAPP AQUI (DDD + Número sem espaços)
+
+  const CATALOGO_PRODUTOS = [
+    // LUA NOVA
+    {
+      id: "nova-1",
+      fase: "nova",
+      nome: "Kit Primeira Vez",
+      descricao: "Vela sensorial + guia ilustrado de autoconhecimento.",
+      preco: 129,
+      precoAntigo: 159,
+      tag: "novo",
+      tagTipo: "", // "scarce" deixa rosa
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "nova-2",
+      fase: "nova",
+      nome: "Estimulador Compacto Suave",
+      descricao: "Silencioso, à prova d'água, 3 intensidades.",
+      preco: 189,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "nova-3",
+      fase: "nova",
+      nome: "Óleo de Massagem Aquecedor",
+      descricao: "100ml, fórmula vegana, ativa ao toque.",
+      preco: 79,
+      precoAntigo: null,
+      tag: "favorito",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "nova-4",
+      fase: "nova",
+      nome: "Anel Vibratório Básico",
+      descricao: "Uso a dois, silicone hipoalergênico.",
+      preco: 99,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=80"
+    },
+
+    // LUA CRESCENTE
+    {
+      id: "crescente-1",
+      fase: "crescente",
+      nome: "Vibrador Bala Discreto",
+      descricao: "Tamanho bolso, 7 modos, recarregável via USB.",
+      preco: 219,
+      precoAntigo: null,
+      tag: "mais vendido",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "crescente-2",
+      fase: "crescente",
+      nome: "Plug Iniciante em Silicone",
+      descricao: "Formato anatômico, base segura, tamanho P.",
+      preco: 149,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "crescente-3",
+      fase: "crescente",
+      nome: "Lubrificante à Base de Água",
+      descricao: "200ml, sem fragrância, compatível com preservativo.",
+      preco: 59,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "crescente-4",
+      fase: "crescente",
+      nome: "Algemas de Cetim",
+      descricao: "Fecho de liberação rápida, acolchoadas.",
+      preco: 89,
+      precoAntigo: null,
+      tag: "últimas unidades",
+      tagTipo: "scarce",
+      imagem: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80"
+    },
+
+    // LUA CHEIA
+    {
+      id: "cheia-1",
+      fase: "cheia",
+      nome: "Vibrador Premium Multi-função",
+      descricao: "App de controle, 12 modos, silicone médico.",
+      preco: 449,
+      precoAntigo: null,
+      tag: "premium",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "cheia-2",
+      fase: "cheia",
+      nome: "Kit Casal Sensações Intensas",
+      descricao: "4 peças, para explorar juntos em ritmo intenso.",
+      preco: 389,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "cheia-3",
+      fase: "cheia",
+      nome: "Óleo Beijável Edição Limitada",
+      descricao: "Sabor exclusivo da estação, fórmula vegana.",
+      preco: 99,
+      precoAntigo: null,
+      tag: "últimas unidades",
+      tagTipo: "scarce",
+      imagem: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "cheia-4",
+      fase: "cheia",
+      nome: "Estimulador de Casal Recarregável",
+      descricao: "Uso simultâneo, controle remoto incluso.",
+      preco: 399,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=80"
+    },
+
+    // LUA MINGUANTE
+    {
+      id: "minguante-1",
+      fase: "minguante",
+      nome: "Vela de Massagem Recarga",
+      descricao: "Reposição do kit primeira vez, aroma âmbar.",
+      preco: 69,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "minguante-2",
+      fase: "minguante",
+      nome: "Kit Ritual de Autocuidado",
+      descricao: "5 peças para um momento só seu, semanalmente.",
+      preco: 179,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "minguante-3",
+      fase: "minguante",
+      nome: "Óleo Corporal Relaxante",
+      descricao: "Lavanda e camomila, 150ml.",
+      preco: 85,
+      precoAntigo: null,
+      tag: "",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      id: "minguante-4",
+      fase: "minguante",
+      nome: "Assinatura Nü Mensal",
+      descricao: "Um item novo por mês, com curadoria personalizada.",
+      preco: 99,
+      precoAntigo: null,
+      tag: "assinatura",
+      tagTipo: "",
+      imagem: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=500&q=80"
+    }
+  ];
+
+  // RENDERIZADOR AUTOMÁTICO DO CATÁLOGO
+  function renderizarCatalogo() {
+    const fases = ["nova", "crescente", "cheia", "minguante"];
+    fases.forEach(fase => {
+      const container = document.getElementById(`grid-${fase}`);
+      if (!container) return;
+      container.innerHTML = "";
+      
+      const produtosDaFase = CATALOGO_PRODUTOS.filter(p => p.fase === fase);
+      produtosDaFase.forEach(p => {
+        const tagHTML = p.tag ? `<span class="badge-tag ${p.tagTipo}">${p.tag}</span>` : "";
+        const precoAntigoHTML = p.precoAntigo ? `<span class="price-old">R$ ${p.precoAntigo}</span>` : "";
+        
+        container.innerHTML += `
+          <article class="card">
+            <div class="card-thumb">
+              ${tagHTML}
+              <img src="${p.imagem}" alt="${p.nome}" loading="lazy">
+            </div>
+            <div class="card-body">
+              <h4>${p.nome}</h4>
+              <p>${p.descricao}</p>
+              <div class="price-row">
+                <span class="price">R$ ${p.preco}</span>
+                ${precoAntigoHTML}
+              </div>
+              <button class="add-btn" onclick="addToCart('${p.id}', this)">Adicionar</button>
+            </div>
+          </article>
+        `;
+      });
+    });
+  }
+
+  // GERENCIAMENTO DA SACOLA
+  let cart = [];
+  const FREE_SHIPPING_THRESHOLD = 250;
+
+  function addToCart(id, btnElement) {
+    const itemCatalog = CATALOGO_PRODUTOS.find(p => p.id === id);
+    if (!itemCatalog) return;
+
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({
+        id: itemCatalog.id,
+        title: itemCatalog.nome,
+        price: itemCatalog.preco,
+        imagem: itemCatalog.imagem,
+        qty: 1
+      });
+    }
+    updateCartUI();
+    
+    if (btnElement) {
+      const originalText = btnElement.textContent;
+      btnElement.textContent = 'Adicionado ✓';
+      btnElement.classList.add('added');
+      setTimeout(() => { 
+        btnElement.textContent = originalText; 
+        btnElement.classList.remove('added'); 
+      }, 1600);
+    }
+
+    toggleCart(true);
+  }
+
+  function changeQty(index, delta) {
+    cart[index].qty += delta;
+    if (cart[index].qty <= 0) {
+      cart.splice(index, 1);
+    }
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const shipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0 ? 0 : 19;
+    const total = subtotal + shipping;
+
+    const badgeEl = document.getElementById('cartBadge');
+    badgeEl.textContent = totalItems;
+    badgeEl.classList.toggle('show', totalItems > 0);
+    document.getElementById('cartCountHeader').textContent = totalItems;
+
+    const progressEl = document.getElementById('shippingProgress');
+    const shippingTextEl = document.getElementById('shippingText');
+    const pct = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
+    progressEl.style.width = `${pct}%`;
+
+    if (subtotal >= FREE_SHIPPING_THRESHOLD) {
+      shippingTextEl.textContent = '✓ Frete Grátis Discreto Desbloqueado!';
+      shippingTextEl.style.color = 'var(--sage-dark)';
+    } else {
+      const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
+      shippingTextEl.textContent = `Adicione R$ ${remaining.toFixed(0)} para Frete Grátis Discreto`;
+      shippingTextEl.style.color = 'inherit';
+    }
+
+    const container = document.getElementById('cartItemsContainer');
+    container.innerHTML = '';
+    
+    if (cart.length === 0) {
+      container.innerHTML = `<p style="text-align:center;color:rgba(0,0,0,0.5);margin-top:40px;">Sua sacola está vazia.</p>`;
+    } else {
+      cart.forEach((item, index) => {
+        container.innerHTML += `
+          <div class="cart-item">
+            <div class="cart-item-img"><img src="${item.imagem}" alt="${item.title}"></div>
+            <div class="cart-item-info">
+              <div class="cart-item-title">${item.title}</div>
+              <div class="cart-item-price">R$ ${item.price}</div>
+              <div class="cart-item-actions">
+                <div class="qty-selector">
+                  <button onclick="changeQty(${index}, -1)">-</button>
+                  <span>${item.qty}</span>
+                  <button onclick="changeQty(${index}, 1)">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById('cartSubtotal').textContent = `R$ ${subtotal}`;
+    document.getElementById('cartShipping').textContent = shipping === 0 ? 'Grátis' : `R$ ${shipping}`;
+    document.getElementById('cartTotal').textContent = `R$ ${total}`;
+  }
+
+  function toggleCart(forceOpen = false) {
+    const overlay = document.getElementById('cartOverlay');
+    const drawer = document.getElementById('cartDrawer');
+    if (forceOpen === true) {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+    } else {
+      overlay.classList.toggle('open');
+      drawer.classList.toggle('open');
+    }
+  }
+
+  // REDIRECIONAMENTOS PARA O WHATSAPP
+  function checkoutWhatsapp() {
+    if (cart.length === 0) return alert("Adicione ao menos um produto para consultar a especialista.");
+    
+    let subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    let shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? "Grátis (Discreto)" : "R$ 19,00";
+    let total = subtotal + (subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 19);
+
+    let mensagem = `Olá, Especialista Nü! 🌙 Gostaria de atendimento personalizado e discreto para finalizar o pedido com os seguintes itens:\n\n`;
+    
+    cart.forEach(item => {
+      mensagem += `• ${item.qty}x *${item.title}* — R$ ${item.price * item.qty}\n`;
+    });
+
+    mensagem += `\n*Subtotal:* R$ ${subtotal}`;
+    mensagem += `\n*Frete Discreto:* ${shipping}`;
+    mensagem += `\n*Total:* R$ ${total}\n\n`;
+    mensagem += `Poderia me orientar sobre formas de envio e pagamento?`;
+
+    let url = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP}&text=${encodeURIComponent(mensagem)}`;
+    window.open(url, "_blank");
+  }
+
+  function openGeneralWhatsApp() {
+    let mensagem = `Olá, Especialista Nü! 🌙 Estou navegando pelo site e gostaria de um atendimento discreto para conhecer o catálogo completo de produtos.`;
+    let url = `https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP}&text=${encodeURIComponent(mensagem)}`;
+    window.open(url, "_blank");
+  }
+
+  /* ===================== VIEW ROUTER ===================== */
+  const nav = document.getElementById('mainNav');
+  const navLogo = nav.querySelector('.nav-logo');
+  const navCta = nav.querySelector('.nav-cta');
+
+  function setNavTheme(view){
+    nav.classList.remove('on-light','on-dark','scrolled');
+    if(view === 'quiz'){
+      nav.classList.add('on-dark');
+      navLogo.classList.remove('light-text'); navLogo.classList.add('dark-text');
+      navCta.classList.remove('light-text'); navCta.classList.add('dark-text');
+    } else {
+      nav.classList.add(view === 'home' ? 'on-dark' : 'on-light');
+      navLogo.classList.remove('dark-text'); navLogo.classList.add(view==='home' ? 'dark-text' : 'light-text');
+      navCta.classList.remove('dark-text'); navCta.classList.add(view==='home' ? 'dark-text' : 'light-text');
+    }
+  }
+
+  function showView(view, anchorId){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+view).classList.add('active');
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+    setNavTheme(view);
+    history.replaceState(null,'','#'+view);
+
+    if(view === 'colecao' && anchorId){
+      const target = document.querySelector('.tab[data-tab="'+anchorId+'"]');
+      if(target) target.click();
+    }
+    if(view === 'home' && anchorId){
+      setTimeout(()=>scrollToId(anchorId), 50);
+    }
+  }
+  function scrollToId(id){
+    const el = document.getElementById(id);
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  }
+
+  window.addEventListener('scroll', ()=>{
+    const activeView = document.querySelector('.view.active').id;
+    if(activeView === 'view-home' || activeView === 'view-quiz'){
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    }
+  });
+
+  setNavTheme('home');
+
+  /* ===================== SCROLL REVEAL (home) ===================== */
+  const revealEls = document.querySelectorAll('[data-reveal]');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.15});
+  revealEls.forEach(el=>io.observe(el));
+
+  /* ===================== COLEÇÃO: TABS ===================== */
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.cat-panel');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>t.classList.remove('active'));
+      panels.forEach(p=>p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ===================== QUIZ E FUNIL PÓS-RESULTADO ===================== */
+  const qsteps = document.querySelectorAll('.qstep');
+  const totalQuestions = 3;
+  let scores = {nova:0, crescente:0, cheia:0, minguante:0};
+
+  function goToStep(stepId){
+    qsteps.forEach(s=>s.classList.remove('active'));
+    document.querySelector('.qstep[data-step="'+stepId+'"]').classList.add('active');
+    if(stepId !== 'result'){
+      const pct = ((stepId-1)/totalQuestions)*100 + 10;
+      document.getElementById('progressFill').style.width = Math.min(pct,95)+'%';
+      document.getElementById('progressLabel').textContent = stepId+' de '+totalQuestions;
+      document.getElementById('progressRow').style.display = 'flex';
+    } else {
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressRow').style.display = 'none';
+      showResult();
+    }
+  }
+
+  document.querySelectorAll('.options').forEach(group=>{
+    group.addEventListener('click', (e)=>{
+      const opt = e.target.closest('.option');
+      if(!opt) return;
+      group.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      const stepEl = group.closest('.qstep');
+      stepEl.querySelector('.qbtn-next').classList.add('enabled');
+      stepEl.dataset.selectedScore = opt.dataset.score;
+      setTimeout(()=>{
+        const nextBtn = stepEl.querySelector('.qbtn-next');
+        if(nextBtn) nextBtn.click();
+      }, 380);
+    });
+  });
+
+  document.querySelectorAll('.qbtn-next').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!btn.classList.contains('enabled')) return;
+      const stepEl = btn.closest('.qstep');
+      const scoreData = stepEl.dataset.selectedScore;
+      if(scoreData){
+        const [cat, val] = scoreData.split(':');
+        scores[cat] += parseInt(val);
+      }
+      goToStep(btn.dataset.next);
+    });
+  });
+  document.querySelectorAll('.qbtn-back').forEach(btn=>{
+    btn.addEventListener('click', ()=> goToStep(btn.dataset.back));
+  });
+
+  const resultData = {
+    nova:{title:'Lua Nova · Descubra', desc:'Você está no início dessa jornada — e tudo bem começar devagar. Selecionamos itens simples e guiados para você dar o primeiro passo com conforto.', tab:'nova',
+      products:[{name:'Kit Primeira Vez',desc:'Vela + guia ilustrado'},{name:'Óleo de Massagem Aquecedor',desc:'100ml, fórmula vegana'},{name:'Anel Vibratório Básico',desc:'Uso a dois'}]},
+    crescente:{title:'Lua Crescente · Explore', desc:'Você já deu os primeiros passos e está pronto(a) para ir além, sem exagero. Aqui está uma seleção pensada para essa fase.', tab:'crescente',
+      products:[{name:'Vibrador Bala Discreto',desc:'7 modos, recarregável'},{name:'Plug Iniciante em Silicone',desc:'Formato anatômico'},{name:'Lubrificante à Base de Água',desc:'200ml, sem fragrância'}]},
+    cheia:{title:'Lua Cheia · Viva', desc:'Você já sabe o que quer — e merece o melhor da nossa curadoria premium, pensada pra quem busca intensidade de verdade.', tab:'cheia',
+      products:[{name:'Vibrador Premium Multi-função',desc:'App de controle, 12 modos'},{name:'Kit Casal Sensações Intensas',desc:'4 peças'},{name:'Estimulador de Casal Recarregável',desc:'Controle remoto incluso'}]},
+    minguante:{title:'Lua Minguante · Volte a se encontrar', desc:'Pra você, prazer é hábito, não evento. Selecionamos itens de bem-estar contínuo pra manter esse cuidado com você mesmo(a).', tab:'minguante',
+      products:[{name:'Kit Ritual de Autocuidado',desc:'5 peças, uso semanal'},{name:'Óleo Corporal Relaxante',desc:'Lavanda e camomila'},{name:'Assinatura Nü Mensal',desc:'Um item novo por mês'}]}
+  };
+
+  function showResult(){
+    let winner = 'nova', max = -1;
+    for(const key in scores){ if(scores[key] > max){ max = scores[key]; winner = key; } }
+    const data = resultData[winner];
+    document.getElementById('resultTitle').textContent = data.title;
+    document.getElementById('resultDesc').textContent = data.desc;
+    
+    const cta = document.getElementById('resultCta');
+    cta.onclick = ()=> showView('colecao', data.tab);
+
+    const wrap = document.getElementById('resultProducts');
+    wrap.innerHTML = '';
+    data.products.forEach(p=>{
+      const div = document.createElement('div');
+      div.className='rp-card';
+      div.innerHTML = '<h4>'+p.name+'</h4><p>'+p.desc+'</p>';
+      wrap.appendChild(div);
+    });
+  }
+
+  function restartQuiz(){
+    scores = {nova:0, crescente:0, cheia:0, minguante:0};
+    document.querySelectorAll('.option.selected').forEach(o=>o.classList.remove('selected'));
+    document.querySelectorAll('.qbtn-next').forEach(b=>b.classList.remove('enabled'));
+    goToStep(1);
+  }
+
+  // INICIALIZAÇÃO DA PÁGINA E DO CATÁLOGO
+  renderizarCatalogo();
+  const initial = window.location.hash.replace('#','');
+  if(['home','colecao','quiz'].includes(initial)) showView(initial);
+</script>
+
+</body>
+</html>
